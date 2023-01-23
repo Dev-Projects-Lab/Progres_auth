@@ -28,9 +28,9 @@ const modifyPwd = async (request, response, next) => {
     let existingUser;
     try {
         existingUser = await User.findOne({ email: email })
-            .then((student) => {
-                student.password = password;
-                student.save();
+            .then((user) => {
+                user.password = password;
+                user.save();
             });
     } catch (err) {
         const error = new HttpError(
@@ -52,7 +52,7 @@ const signup = async (request, response, next) => {
             new HttpError('Invalid inputs passed, please check your data.', 422)
         );
     }
-    const { username, email, password } = request.body;
+    const { username, email, password, profile } = request.body;
 
     let existingUser;
     try {
@@ -86,7 +86,8 @@ const signup = async (request, response, next) => {
     const createdUser = new User({
         username,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        profile
     });
 
     try {
@@ -102,7 +103,7 @@ const signup = async (request, response, next) => {
     try {
         token = jwt.sign(
             { userId: createdUser._id, email: createdUser.email },
-           process.env.KEY_JW_TOKEN,
+                process.env.KEY_JW_TOKEN,
             { expiresIn: '1h' }
         );
     } catch (err) {
